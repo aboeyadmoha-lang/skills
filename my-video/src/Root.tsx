@@ -2,6 +2,7 @@ import { Composition, Folder } from "remotion";
 import { HelloWorld } from "./HelloWorld";
 import { Logo } from "./HelloWorld/Logo";
 import { Title } from "./HelloWorld/Title";
+import { RayhanPromo } from "./Rayhan/RayhanPromo";
 
 // Each <Composition> is an entry in the sidebar!
 
@@ -50,7 +51,14 @@ export const RemotionRoot: React.FC = () => {
           titleColor: "#000000",
         }}
       />
-
+      <Composition
+        id="RayhanPromo"
+        component={RayhanPromo}
+        durationInFrames={450}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
     </>
   );
 };
