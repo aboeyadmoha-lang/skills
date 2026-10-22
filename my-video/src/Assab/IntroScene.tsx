@@ -6,45 +6,59 @@ import {
   useVideoConfig,
 } from "remotion";
 import { AssabMark } from "./AssabMark";
-import { DISPLAY, LAVENDER, TEXT } from "./theme";
+import { BRAND_CYAN, DISPLAY, LAVENDER, TEXT } from "./theme";
 
 const IntroSceneInner = ({
   title,
+  accent,
   audience,
 }: {
   readonly title: string;
+  readonly accent: string;
   readonly audience: string;
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
+  const fadeUp = (from: number) => ({
+    opacity: interpolate(frame, [from * fps, (from + 0.45) * fps], [0, 1], {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+    }),
+    translate: `0px ${interpolate(
+      frame,
+      [from * fps, (from + 0.45) * fps],
+      [24, 0],
+      {
+        extrapolateLeft: "clamp",
+        extrapolateRight: "clamp",
+        easing: Easing.bezier(0.16, 1, 0.3, 1),
+      },
+    )}px`,
+  });
 
   return (
     <>
-      {/* Logo only fades in; it is never scaled or distorted. */}
+      {/* Mark sits alone with its protection area; revealed by a mask only. */}
       <div
         style={{
           position: "absolute",
-          top: 520,
+          top: 560,
           left: 0,
           right: 0,
           display: "flex",
           justifyContent: "center",
-          opacity: interpolate(frame, [0, 0.8 * fps], [0, 1], {
-            extrapolateLeft: "clamp",
-            extrapolateRight: "clamp",
-          }),
         }}
       >
-        <AssabMark size={300} color="#FFFFFF" />
+        <AssabMark height={200} variant="white" revealAt={0.2} />
       </div>
       <div
         dir="rtl"
         lang="ar"
         style={{
           position: "absolute",
-          top: 1110,
-          left: 90,
-          right: 90,
+          top: 1060,
+          left: 80,
+          right: 80,
           textAlign: "center",
         }}
       >
@@ -53,26 +67,13 @@ const IntroSceneInner = ({
           style={{
             fontFamily: DISPLAY,
             fontWeight: 700,
-            fontSize: 140,
-            lineHeight: 1.25,
+            fontSize: 132,
+            lineHeight: 1.2,
             color: "#FFFFFF",
-            opacity: interpolate(frame, [1.6 * fps, 2.3 * fps], [0, 1], {
-              extrapolateLeft: "clamp",
-              extrapolateRight: "clamp",
-            }),
-            translate: interpolate(
-              frame,
-              [1.6 * fps, 2.3 * fps],
-              ["0px 30px", "0px 0px"],
-              {
-                extrapolateLeft: "clamp",
-                extrapolateRight: "clamp",
-                easing: Easing.bezier(0.16, 1, 0.3, 1),
-              },
-            ),
+            ...fadeUp(1.0),
           }}
         >
-          {title}
+          {title} <span style={{ color: BRAND_CYAN }}>{accent}</span>
         </Interactive.Div>
         <Interactive.Div
           name="Audience"
@@ -80,12 +81,9 @@ const IntroSceneInner = ({
             fontFamily: TEXT,
             fontWeight: 500,
             fontSize: 60,
-            marginTop: 20,
+            marginTop: 24,
             color: LAVENDER,
-            opacity: interpolate(frame, [0.5 * fps, 1.2 * fps], [0, 1], {
-              extrapolateLeft: "clamp",
-              extrapolateRight: "clamp",
-            }),
+            ...fadeUp(0.6),
           }}
         >
           {audience}
@@ -100,7 +98,8 @@ export const IntroScene = Interactive.create({
   layout: "absolute-fill",
   schema: {
     ...Interactive.backgroundSchema,
-    title: { type: "string", default: "عصب قريبًا", description: "Title" },
+    title: { type: "string", default: "عصب", description: "Title" },
+    accent: { type: "string", default: "قريبًا", description: "Accent" },
     audience: {
       type: "string",
       default: "لأصحاب المطاعم",

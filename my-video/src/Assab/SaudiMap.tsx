@@ -1,6 +1,6 @@
 import { interpolate, useCurrentFrame, useVideoConfig } from "remotion";
 import { SAUDI_MAP } from "./saudiMap";
-import { LAND, PURPLE, VIOLET } from "./theme";
+import { BRAND_CYAN, BRAND_DARK, BRAND_PURPLE, LAND } from "./theme";
 
 // Phase boundaries in seconds, relative to the map scene.
 export const MAP_PHASES = {
@@ -89,9 +89,9 @@ export const SaudiMap: React.FC<{ readonly width: number }> = ({ width }) => {
           r={300}
           gradientUnits="userSpaceOnUse"
         >
-          <stop offset="0%" stopColor={VIOLET} stopOpacity={0.75} />
-          <stop offset="60%" stopColor={VIOLET} stopOpacity={0.3} />
-          <stop offset="100%" stopColor={VIOLET} stopOpacity={0} />
+          <stop offset="0%" stopColor={BRAND_PURPLE} stopOpacity={0.75} />
+          <stop offset="60%" stopColor={BRAND_PURPLE} stopOpacity={0.3} />
+          <stop offset="100%" stopColor={BRAND_PURPLE} stopOpacity={0} />
         </radialGradient>
         <radialGradient
           id="sweep"
@@ -100,9 +100,9 @@ export const SaudiMap: React.FC<{ readonly width: number }> = ({ width }) => {
           r={Math.max(sweepRadius, 1)}
           gradientUnits="userSpaceOnUse"
         >
-          <stop offset="0%" stopColor={VIOLET} stopOpacity={0.55} />
-          <stop offset="75%" stopColor={VIOLET} stopOpacity={0.3} />
-          <stop offset="100%" stopColor={VIOLET} stopOpacity={0} />
+          <stop offset="0%" stopColor={BRAND_PURPLE} stopOpacity={0.7} />
+          <stop offset="65%" stopColor={BRAND_PURPLE} stopOpacity={0.35} />
+          <stop offset="100%" stopColor={BRAND_CYAN} stopOpacity={0.35} />
         </radialGradient>
         <filter id="soft-glow" x="-20%" y="-20%" width="140%" height="140%">
           <feGaussianBlur stdDeviation="12" />
@@ -121,18 +121,18 @@ export const SaudiMap: React.FC<{ readonly width: number }> = ({ width }) => {
       {/* Next step: a broad western glow and the Eastern Province, each standing alone */}
       <g clipPath="url(#ksa-clip)" opacity={nextOpacity}>
         <circle cx={wx} cy={wy} r={300} fill="url(#west-glow)" />
-        <path d={SAUDI_MAP.eastern} fill={VIOLET} fillOpacity={0.55} />
+        <path d={SAUDI_MAP.eastern} fill={BRAND_PURPLE} fillOpacity={0.55} />
       </g>
 
       {/* Starting point: Riyadh region */}
       <g opacity={riyadhOpacity}>
         <path
           d={SAUDI_MAP.riyadh}
-          fill={VIOLET}
+          fill={BRAND_PURPLE}
           filter="url(#soft-glow)"
           opacity={0.6}
         />
-        <path d={SAUDI_MAP.riyadh} fill={VIOLET} />
+        <path d={SAUDI_MAP.riyadh} fill={BRAND_PURPLE} />
       </g>
 
       {/* Later: graduated light spreading through the whole kingdom */}
@@ -151,7 +151,7 @@ export const SaudiMap: React.FC<{ readonly width: number }> = ({ width }) => {
       <path
         d={SAUDI_MAP.country}
         fill="none"
-        stroke={PURPLE}
+        stroke={BRAND_DARK}
         strokeWidth={2.4}
         strokeLinejoin="round"
       />

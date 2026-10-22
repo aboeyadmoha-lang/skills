@@ -23,9 +23,12 @@ for (const [file, weight] of [
   });
 }
 
-export const PURPLE_DEEP = "#1B0938";
-export const PURPLE = "#3A1C71";
-export const VIOLET = "#6D3FE0";
+// Assab identity v04 palette.
+export const BRAND_PURPLE = "#6E29F6";
+export const BRAND_CYAN = "#01F6F7";
+export const BRAND_DARK = "#3A2D7D";
+// Backgrounds matched to the latest Assab video.
+export const NIGHT = "#1A1146";
+export const SURFACE = "#F4F2FA";
+export const LAND = "#E5DFF6";
 export const LAVENDER = "#C9B8FF";
-export const SURFACE = "#F6F3FB";
-export const LAND = "#E4DCF4";

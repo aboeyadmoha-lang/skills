@@ -1,13 +1,13 @@
 import {
   Interactive,
+  interpolate,
   useCurrentFrame,
   useVideoConfig,
-  interpolate,
 } from "remotion";
 import { AssabMark } from "./AssabMark";
+import { Backdrop } from "./Backdrop";
 import { Caption } from "./Caption";
 import { MAP_PHASES, SaudiMap } from "./SaudiMap";
-import { PURPLE } from "./theme";
 
 const MapSceneInner = () => {
   const frame = useCurrentFrame();
@@ -15,26 +15,17 @@ const MapSceneInner = () => {
 
   return (
     <>
-      {/* Small protected mark, kept clear of the map */}
-      <div
-        style={{
-          position: "absolute",
-          top: 130,
-          left: 90,
-          opacity: interpolate(frame, [0.3 * fps, 0.9 * fps], [0, 1], {
-            extrapolateLeft: "clamp",
-            extrapolateRight: "clamp",
-          }),
-        }}
-      >
-        <AssabMark size={110} color={PURPLE} />
+      <Backdrop />
+      {/* Small mark, kept clear of the map */}
+      <div style={{ position: "absolute", top: 110, left: 80 }}>
+        <AssabMark height={64} variant="color" revealAt={0.3} />
       </div>
       <div
         style={{
           position: "absolute",
-          top: 820,
+          top: 860,
           left: 40,
-          opacity: interpolate(frame, [0, 0.8 * fps], [0, 1], {
+          opacity: interpolate(frame, [0, 0.5 * fps], [0, 1], {
             extrapolateLeft: "clamp",
             extrapolateRight: "clamp",
           }),
@@ -43,36 +34,40 @@ const MapSceneInner = () => {
         <SaudiMap width={1000} />
       </div>
       <Caption
-        name="Intro caption"
-        kicker=""
-        title="متابعة أوضح لتشغيل مطعمك"
+        name="Platform caption"
+        tag=""
+        title="متابعة أوضح"
+        accent="لتشغيل مطعمك"
         start={0.4}
         end={MAP_PHASES.riyadh}
-        style={{ top: 420 }}
+        style={{ top: 330 }}
       />
       <Caption
         name="Riyadh caption"
-        kicker="خطة الانطلاق"
-        title="البداية: الرياض"
+        tag="خطة الانطلاق"
+        title="البداية:"
+        accent="الرياض"
         start={MAP_PHASES.riyadh}
         end={MAP_PHASES.next}
-        style={{ top: 420 }}
+        style={{ top: 280 }}
       />
       <Caption
         name="Next step caption"
-        kicker="الخطوة القادمة"
-        title="الغربية والشرقية"
+        tag=""
+        title="الخطوة القادمة"
+        accent="الغربية والشرقية"
         start={MAP_PHASES.next}
         end={MAP_PHASES.later}
-        style={{ top: 420 }}
+        style={{ top: 330 }}
       />
       <Caption
         name="Later caption"
-        kicker="لاحقًا بإذن الله"
-        title="كل مدن المملكة"
+        tag=""
+        title="لاحقًا بإذن الله"
+        accent="كل مدن المملكة"
         start={MAP_PHASES.later}
         end={MAP_PHASES.end}
-        style={{ top: 420 }}
+        style={{ top: 330 }}
       />
     </>
   );

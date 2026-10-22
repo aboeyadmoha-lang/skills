@@ -5,9 +5,10 @@ import {
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
-import { AssabMark } from "./AssabMark";
-import { DISPLAY, LAVENDER, TEXT } from "./theme";
+import { BRAND_CYAN, DISPLAY, TEXT } from "./theme";
 
+// Call to action on the dark background, as in the latest Assab video.
+// The logo lockup that follows is the original closing, used as is.
 const OutroSceneInner = ({
   cta,
   status,
@@ -20,82 +21,48 @@ const OutroSceneInner = ({
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const fadeIn = (from: number) =>
-    interpolate(frame, [from * fps, (from + 0.6) * fps], [0, 1], {
+    interpolate(frame, [from * fps, (from + 0.45) * fps], [0, 1], {
       extrapolateLeft: "clamp",
       extrapolateRight: "clamp",
       easing: Easing.bezier(0.16, 1, 0.3, 1),
     });
 
   return (
-    <>
-      <div
+    <div style={{ textAlign: "center", padding: "0 80px" }}>
+      <Interactive.Div
+        name="Call to action"
+        dir="rtl"
+        lang="ar"
         style={{
-          position: "absolute",
-          top: 480,
-          left: 0,
-          right: 0,
-          display: "flex",
-          justifyContent: "center",
-          opacity: fadeIn(0.3),
+          fontFamily: DISPLAY,
+          fontWeight: 700,
+          fontSize: 124,
+          lineHeight: 1.2,
+          color: "#FFFFFF",
+          opacity: fadeIn(0.2),
         }}
       >
-        <AssabMark size={300} color="#FFFFFF" />
-      </div>
-      <div
-        style={{
-          position: "absolute",
-          top: 1080,
-          left: 90,
-          right: 90,
-          textAlign: "center",
-        }}
-      >
-        <Interactive.Div
-          name="Call to action"
-          dir="rtl"
-          lang="ar"
-          style={{
-            fontFamily: DISPLAY,
-            fontWeight: 700,
-            fontSize: 130,
-            lineHeight: 1.25,
-            color: "#FFFFFF",
-            opacity: fadeIn(0.9),
-          }}
-        >
-          {cta}
-        </Interactive.Div>
-        <Interactive.Div
-          name="Status"
-          dir="rtl"
-          lang="ar"
-          style={{
-            fontFamily: TEXT,
-            fontWeight: 500,
-            fontSize: 64,
-            marginTop: 16,
-            color: LAVENDER,
-            opacity: fadeIn(1.4),
-          }}
-        >
+        {cta}
+        <br />
+        <span style={{ color: BRAND_CYAN, opacity: fadeIn(0.6) }}>
           {status}
-        </Interactive.Div>
-        <Interactive.Div
-          name="Website"
-          dir="ltr"
-          style={{
-            fontFamily: TEXT,
-            fontWeight: 400,
-            fontSize: 54,
-            marginTop: 70,
-            color: "#FFFFFF",
-            opacity: fadeIn(1.9),
-          }}
-        >
-          {website}
-        </Interactive.Div>
-      </div>
-    </>
+        </span>
+      </Interactive.Div>
+      <Interactive.Div
+        name="Website"
+        dir="ltr"
+        style={{
+          fontFamily: TEXT,
+          fontWeight: 500,
+          fontSize: 50,
+          marginTop: 70,
+          color: "#FFFFFF",
+          opacity: fadeIn(1.0),
+        }}
+      >
+        {website}
+      </Interactive.Div>
+    </div>
   );
 };
 
@@ -106,10 +73,10 @@ export const OutroScene = Interactive.create({
     ...Interactive.backgroundSchema,
     cta: {
       type: "string",
-      default: "تابعوا عصب",
+      default: "تابعوا عصب.",
       description: "Call to action",
     },
-    status: { type: "string", default: "قريبًا", description: "Status" },
+    status: { type: "string", default: "قريبًا.", description: "Status" },
     website: { type: "string", default: "Assab.io", description: "Website" },
   },
 });

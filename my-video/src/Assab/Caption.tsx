@@ -5,31 +5,38 @@ import {
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
-import { DISPLAY, PURPLE, TEXT, VIOLET } from "./theme";
+import { BRAND_DARK, BRAND_PURPLE, DISPLAY, TEXT } from "./theme";
 
-// A kicker line over a headline. `start` and `end` are in seconds, relative to
-// the scene, so each caption fades in and out on its own.
+// Optional tag pill, a dark headline line and a purple accent line.
+// `start` and `end` are seconds relative to the scene.
 const CaptionInner = ({
-  kicker,
+  tag,
   title,
+  accent,
   start,
   end,
   style,
 }: {
-  readonly kicker: string;
+  readonly tag: string;
   readonly title: string;
+  readonly accent: string;
   readonly start: number;
   readonly end: number;
   readonly style?: React.CSSProperties;
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const enter = interpolate(frame, [start * fps, (start + 0.6) * fps], [0, 1], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-    easing: Easing.bezier(0.16, 1, 0.3, 1),
-  });
-  const exit = interpolate(frame, [(end - 0.4) * fps, end * fps], [1, 0], {
+  const enter = interpolate(
+    frame,
+    [start * fps, (start + 0.45) * fps],
+    [0, 1],
+    {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+      easing: Easing.bezier(0.16, 1, 0.3, 1),
+    },
+  );
+  const exit = interpolate(frame, [(end - 0.35) * fps, end * fps], [1, 0], {
     extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
@@ -40,25 +47,39 @@ const CaptionInner = ({
       lang="ar"
       style={{
         position: "absolute",
-        left: 90,
-        right: 90,
+        left: 80,
+        right: 80,
         textAlign: "right",
         opacity: Math.min(enter, exit),
-        translate: `0px ${(1 - enter) * 30}px`,
+        translate: `0px ${(1 - enter) * 24}px`,
         ...style,
       }}
     >
-      {kicker ? (
+      {tag ? (
         <div
           style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 12,
+            padding: "8px 22px",
+            borderRadius: 999,
+            backgroundColor: BRAND_DARK,
+            color: "#FFFFFF",
             fontFamily: TEXT,
             fontWeight: 500,
-            fontSize: 50,
-            color: VIOLET,
-            marginBottom: 12,
+            fontSize: 38,
+            marginBottom: 22,
           }}
         >
-          {kicker}
+          <span
+            style={{
+              width: 10,
+              height: 10,
+              borderRadius: "50%",
+              backgroundColor: "#FFFFFF",
+            }}
+          />
+          {tag}
         </div>
       ) : null}
       <div
@@ -66,11 +87,17 @@ const CaptionInner = ({
           fontFamily: DISPLAY,
           fontWeight: 700,
           fontSize: 104,
-          lineHeight: 1.25,
-          color: PURPLE,
+          lineHeight: 1.2,
+          color: BRAND_DARK,
         }}
       >
         {title}
+        {accent ? (
+          <>
+            <br />
+            <span style={{ color: BRAND_PURPLE }}>{accent}</span>
+          </>
+        ) : null}
       </div>
     </div>
   );
@@ -80,8 +107,9 @@ export const Caption = Interactive.create({
   Component: CaptionInner,
   layout: "none",
   schema: {
-    kicker: { type: "string", default: "", description: "Kicker" },
+    tag: { type: "string", default: "", description: "Tag" },
     title: { type: "string", default: "", description: "Headline" },
+    accent: { type: "string", default: "", description: "Accent line" },
     start: {
       type: "number",
       default: 0,

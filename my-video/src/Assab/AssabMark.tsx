@@ -1,41 +1,40 @@
-import { Img, staticFile } from "remotion";
-import { DISPLAY } from "./theme";
+import {
+  Easing,
+  Img,
+  interpolate,
+  staticFile,
+  useCurrentFrame,
+  useVideoConfig,
+} from "remotion";
 
-// The original "A" mark. Until the real logo file is provided, a clearly
-// marked placeholder is drawn in its place. Drop the file at
-// public/assab/logo.svg and set `src="assab/logo.svg"` to use it.
+// Logo files are 1.83042 : 1 (identity guide). The mark is never stretched,
+// rotated, outlined or given a shadow; it may only be revealed with a mask.
+const RATIO = 1.83042;
+
 export const AssabMark: React.FC<{
-  readonly size: number;
-  readonly color: string;
-  readonly src?: string;
-}> = ({ size, color, src }) => {
-  if (src) {
-    return (
-      <Img
-        src={staticFile(src)}
-        style={{ width: size, height: size, objectFit: "contain" }}
-      />
-    );
-  }
+  readonly height: number;
+  readonly variant: "color" | "white";
+  readonly revealAt?: number;
+}> = ({ height, variant, revealAt }) => {
+  const frame = useCurrentFrame();
+  const { fps } = useVideoConfig();
+  const reveal =
+    revealAt === undefined
+      ? 1
+      : interpolate(frame, [revealAt * fps, (revealAt + 0.5) * fps], [0, 1], {
+          extrapolateLeft: "clamp",
+          extrapolateRight: "clamp",
+          easing: Easing.bezier(0.16, 1, 0.3, 1),
+        });
 
   return (
-    <div
+    <Img
+      src={staticFile(`assab/logo-${variant}.svg`)}
       style={{
-        width: size,
-        height: size,
-        border: `${Math.max(2, size / 60)}px dashed ${color}`,
-        borderRadius: size * 0.18,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        fontFamily: DISPLAY,
-        fontWeight: 700,
-        fontSize: size * 0.62,
-        color,
-        lineHeight: 1,
+        height,
+        width: height * RATIO,
+        clipPath: `inset(0 ${(1 - reveal) * 100}% 0 0)`,
       }}
-    >
-      A
-    </div>
+    />
   );
 };

@@ -1,13 +1,15 @@
-import { Audio } from "@remotion/media";
+import { Audio, Video } from "@remotion/media";
 import { linearTiming, TransitionSeries } from "@remotion/transitions";
 import { fade } from "@remotion/transitions/fade";
 import { staticFile, Track, useVideoConfig } from "remotion";
 import { IntroScene } from "./IntroScene";
 import { MapScene } from "./MapScene";
 import { OutroScene } from "./OutroScene";
-import { PURPLE_DEEP, SURFACE } from "./theme";
+import { NIGHT, SURFACE } from "./theme";
 
-// 4.2s + 22.6s + 6s - 2 × 0.4s fades = 32s.
+// 4.2s + 22.6s + 4s + 4.5s lockup - 3 × 0.4s fades = 33.7s.
+// The scripted 32s ends at the call to action; the original Assab logo
+// lockup from the latest video is appended after it, untouched.
 // Each voiceover line is cut from the recording and placed at its scene.
 export const AssabLaunch: React.FC = () => {
   const { fps } = useVideoConfig();
@@ -19,10 +21,11 @@ export const AssabLaunch: React.FC = () => {
         <TransitionSeries.Sequence name="Intro" durationInFrames={4.2 * fps}>
           <IntroScene
             name="Intro"
-            title="عصب قريبًا"
+            title="عصب"
+            accent="قريبًا"
             audience="لأصحاب المطاعم"
             style={{
-              backgroundColor: PURPLE_DEEP,
+              backgroundColor: NIGHT,
               alignItems: "center",
             }}
           />
@@ -38,17 +41,28 @@ export const AssabLaunch: React.FC = () => {
           presentation={fade()}
           timing={linearTiming({ durationInFrames: 0.4 * fps })}
         />
-        <TransitionSeries.Sequence name="Outro" durationInFrames={6 * fps}>
+        <TransitionSeries.Sequence name="Outro" durationInFrames={4 * fps}>
           <OutroScene
             name="Outro"
-            cta="تابعوا عصب"
-            status="قريبًا"
+            cta="تابعوا عصب."
+            status="قريبًا."
             website="Assab.io"
             style={{
-              backgroundColor: PURPLE_DEEP,
+              backgroundColor: NIGHT,
+              justifyContent: "center",
               alignItems: "center",
             }}
           />
+        </TransitionSeries.Sequence>
+        <TransitionSeries.Transition
+          presentation={fade()}
+          timing={linearTiming({ durationInFrames: 0.4 * fps })}
+        />
+        <TransitionSeries.Sequence
+          name="Logo lockup"
+          durationInFrames={4.5 * fps}
+        >
+          <Video src={staticFile("assab/closing-lockup.mp4")} />
         </TransitionSeries.Sequence>
       </TransitionSeries>
       <Track name="Voiceover">
@@ -90,7 +104,7 @@ export const AssabLaunch: React.FC = () => {
         <Audio
           name="VO 6 – follow us"
           src={vo}
-          from={26.6 * fps}
+          from={26.3 * fps}
           trimBefore={17.6 * fps}
           durationInFrames={2.55 * fps}
         />
