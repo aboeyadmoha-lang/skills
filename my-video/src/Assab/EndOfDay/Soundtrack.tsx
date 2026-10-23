@@ -29,7 +29,11 @@ export const Soundtrack2: React.FC = () => {
       {sfx("Mark", "maximize-004", T2.day.mark, 0.35)}
       {write("Write: end of day", T2.day.title)}
       {sfx("In card", "notification-pop", T2.day.income[0], 0.35)}
+      {[2.5, 2.62, 2.74, 2.86, 2.98, 3.1].map((t, i) =>
+        sfx(`Piece in ${i + 1}`, "tick-004", t, 0.22),
+      )}
       {sfx("Out card", "notification-pop", T2.day.spend[0], 0.35)}
+      {sfx("Pieces out", "maximize-004", 3.6, 0.3)}
       {sfx("To review", "riser", T2.reviewStart - 1.0, 0.3)}
       {write("Write: review", T2.review.title)}
       {sfx("Card 1", "glass-002", T2.review.cards[0], 0.35)}

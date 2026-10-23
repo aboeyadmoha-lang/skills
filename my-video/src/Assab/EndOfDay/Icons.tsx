@@ -20,19 +20,31 @@ const Icon: React.FC<{
   </svg>
 );
 
-export const InIcon: React.FC<{ readonly size: number }> = ({ size }) => (
+// `shift` moves the arrow along its own axis (grid units), so it can be
+// animated into or out of the tray.
+export const InIcon: React.FC<{
+  readonly size: number;
+  readonly shift?: number;
+}> = ({ size, shift = 0 }) => (
   <Icon size={size}>
     <path d="M4 14v5h16v-5" />
-    <path d="M12 3v11" />
-    <path d="M8 10l4 4 4-4" />
+    <g transform={`translate(0 ${shift})`}>
+      <path d="M12 3v11" />
+      <path d="M8 10l4 4 4-4" />
+    </g>
   </Icon>
 );
 
-export const OutIcon: React.FC<{ readonly size: number }> = ({ size }) => (
+export const OutIcon: React.FC<{
+  readonly size: number;
+  readonly shift?: number;
+}> = ({ size, shift = 0 }) => (
   <Icon size={size}>
     <path d="M4 14v5h16v-5" />
-    <path d="M12 14V3" />
-    <path d="M8 7l4-4 4 4" />
+    <g transform={`translate(0 ${-shift})`}>
+      <path d="M12 14V3" />
+      <path d="M8 7l4-4 4 4" />
+    </g>
   </Icon>
 );
 

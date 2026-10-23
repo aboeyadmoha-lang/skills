@@ -14,6 +14,20 @@ import { InIcon, OutIcon } from "./Icons";
 import { T2 } from "./timeline";
 
 const local = (s: number) => s - T2.dayStart;
+const CARD_W = 820;
+// Centre of the card's icon tile, inside the card wrapper.
+const TILE = { x: CARD_W - 34 - 57, y: 30 + 57 };
+// Just past the right edge of the frame, in card-wrapper coordinates.
+const OFF_RIGHT = 1080 - 130 + 90;
+// Pieces of the day: each drops in on "دخل" and flies out on "طلع".
+const PIECES = [
+  { dx: -90, color: BRAND_PURPLE, spin: 70, inAt: 2.05, outAt: 3.55 },
+  { dx: 40, color: BRAND_CYAN, spin: -90, inAt: 2.17, outAt: 3.63 },
+  { dx: -30, color: "#C9B8FF", spin: 50, inAt: 2.29, outAt: 3.71 },
+  { dx: 80, color: BRAND_DARK, spin: -60, inAt: 2.41, outAt: 3.79 },
+  { dx: -60, color: BRAND_CYAN, spin: 80, inAt: 2.53, outAt: 3.87 },
+  { dx: 20, color: BRAND_PURPLE, spin: -70, inAt: 2.65, outAt: 3.95 },
+] as const;
 const clamp = { extrapolateLeft: "clamp", extrapolateRight: "clamp" } as const;
 
 const DaySceneInner = ({
@@ -49,6 +63,29 @@ const DaySceneInner = ({
     [f(d.spend[0]), f(d.spend[0]) + 0.4 * fps],
     [0, 1],
     { ...clamp, easing: ease },
+  );
+  const landPulse = PIECES.reduce(
+    (acc, p) =>
+      acc +
+      Math.max(
+        0,
+        1 - Math.abs(frame - (f(p.inAt) + 0.45 * fps)) / (0.12 * fps),
+      ),
+    0,
+  );
+  const lift = interpolate(frame, [f(3.5), f(3.75), f(4.2)], [0, 1, 0], clamp);
+  // Arrows dip into the tray as pieces arrive, and lift out as they leave.
+  const inArrow = interpolate(
+    frame,
+    [f(2.05), f(2.4), f(2.7), f(3.0)],
+    [-4, 1.5, -1, 0],
+    clamp,
+  );
+  const outArrow = interpolate(
+    frame,
+    [f(3.55), f(3.85), f(4.15), f(4.4)],
+    [-1, 3, -0.5, 0],
+    clamp,
   );
 
   return (
@@ -150,39 +187,121 @@ const DaySceneInner = ({
       >
         <WriteOn text={title} at={local(d.title[0])} dur={d.title[1]} />
       </Interactive.Div>
-      {/* Two editorial phrases in turn, never side by side */}
+      {/* Two editorial phrases in turn, never side by side. Small pieces
+          drop into the "in" card's icon, then fly out of the "out" card's. */}
       <div
         style={{
           position: "absolute",
           top: 640,
-          left: 0,
-          right: 0,
-          display: "flex",
-          justifyContent: "center",
+          left: 130,
+          width: CARD_W,
+          height: 200,
         }}
       >
         <EditorialCard
-          icon={<InIcon size={70} />}
+          icon={<InIcon size={70} shift={inArrow} />}
           label={income}
-          width={820}
+          width={CARD_W}
           fontSize={72}
           style={{
             position: "absolute",
+            top: 0,
+            right: 0,
             opacity: inIn * (1 - inOut),
-            translate: `0px ${(1 - inIn) * 40 - inOut * 40}px`,
+            translate: `0px ${(1 - inIn) * -90 - inOut * 40}px`,
+            scale: `${1 + Math.min(landPulse, 1) * 0.025}`,
           }}
         />
         <EditorialCard
-          icon={<OutIcon size={70} />}
+          icon={<OutIcon size={70} shift={outArrow} />}
           label={spend}
-          width={820}
+          width={CARD_W}
           fontSize={72}
           style={{
             position: "absolute",
+            top: 0,
+            right: 0,
             opacity: outIn,
-            translate: `0px ${(1 - outIn) * 40}px`,
+            translate: `0px ${(1 - outIn) * 40 - lift * 14}px`,
           }}
         />
+        {PIECES.map((p, i) => {
+          const tIn = interpolate(
+            frame,
+            [f(p.inAt), f(p.inAt) + 0.45 * fps],
+            [0, 1],
+            {
+              ...clamp,
+              easing: Easing.in(Easing.quad),
+            },
+          );
+          const tOut = interpolate(
+            frame,
+            [f(p.outAt), f(p.outAt) + 0.6 * fps],
+            [0, 1],
+            {
+              ...clamp,
+              easing: Easing.out(Easing.quad),
+            },
+          );
+          const falling = tIn > 0 && tIn < 1;
+          const rising = tOut > 0 && tOut < 1;
+          if (!falling && !rising) return null;
+          // In: arc up from off-screen lower right into the icon tile.
+          // Out: arc from the tile off-screen to the upper right. Both paths
+          // stay clear of the headline.
+          const t = falling ? tIn : tOut;
+          const from = falling
+            ? { x: OFF_RIGHT + p.dx * 0.4, y: TILE.y + 300 + p.dx }
+            : { x: TILE.x, y: TILE.y };
+          const to = falling
+            ? { x: TILE.x, y: TILE.y }
+            : { x: OFF_RIGHT + p.dx * 0.4, y: TILE.y - 230 + p.dx * 0.6 };
+          const x = from.x + (to.x - from.x) * t;
+          const y = from.y + (to.y - from.y) * t - Math.sin(Math.PI * t) * 90;
+          const size = falling ? 96 - 52 * tIn : 44 + 52 * tOut;
+          const alpha = falling
+            ? Math.min(1, tIn * 5) * (1 - Math.max(0, tIn - 0.8) * 5)
+            : Math.min(1, (1 - tOut) * 3);
+          return (
+            <div
+              key={i}
+              style={{
+                position: "absolute",
+                left: x - size / 2,
+                top: y - size * 0.35,
+                width: size,
+                height: size * 0.7,
+                borderRadius: size * 0.16,
+                backgroundColor: p.color,
+                opacity: alpha,
+                rotate: `${(falling ? tIn : tOut) * p.spin}deg`,
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+                gap: size * 0.1,
+                padding: `0 ${size * 0.18}px`,
+                boxShadow: "0 8px 18px rgba(58,45,125,0.18)",
+              }}
+            >
+              <div
+                style={{
+                  height: size * 0.08,
+                  borderRadius: 9,
+                  backgroundColor: "rgba(255,255,255,0.85)",
+                }}
+              />
+              <div
+                style={{
+                  height: size * 0.08,
+                  width: "60%",
+                  borderRadius: 9,
+                  backgroundColor: "rgba(255,255,255,0.85)",
+                }}
+              />
+            </div>
+          );
+        })}
       </div>
     </>
   );
