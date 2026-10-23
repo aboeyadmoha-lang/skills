@@ -4,24 +4,28 @@ import { T, VO_SPANS } from "./timeline";
 
 // Music bed level: dips under the voiceover, then fades out before the
 // original logo lockup, which brings its own sound.
-const bedVolume = (seconds: number) => {
-  const distance = Math.min(
-    ...VO_SPANS.map(([a, b]) =>
-      seconds < a ? a - seconds : seconds > b ? seconds - b : 0,
-    ),
-  );
-  const duck = interpolate(distance, [0, 0.35], [0.2, 0.5], {
-    extrapolateLeft: "clamp",
-    extrapolateRight: "clamp",
-  });
-  const out = interpolate(
-    seconds,
-    [T.lockupStart - 1.0, T.lockupStart + 0.2],
-    [1, 0],
-    { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
-  );
-  return duck * out;
-};
+export const makeBedVolume =
+  (spans: readonly (readonly [number, number])[], lockupStart: number) =>
+  (seconds: number) => {
+    const distance = Math.min(
+      ...spans.map(([a, b]) =>
+        seconds < a ? a - seconds : seconds > b ? seconds - b : 0,
+      ),
+    );
+    const duck = interpolate(distance, [0, 0.35], [0.2, 0.5], {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+    });
+    const out = interpolate(
+      seconds,
+      [lockupStart - 1.0, lockupStart + 0.2],
+      [1, 0],
+      { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+    );
+    return duck * out;
+  };
+
+const bedVolume = makeBedVolume(VO_SPANS, T.lockupStart);
 
 // Effects: Kenney UI sounds (CC0); bed, riser and shimmer are composed for
 // this video. See public/sfx/CREDITS.md.
