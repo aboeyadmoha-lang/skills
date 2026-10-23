@@ -1,17 +1,17 @@
-import { Video } from "@remotion/media";
+import { Audio, Video } from "@remotion/media";
 import { linearTiming, TransitionSeries } from "@remotion/transitions";
 import { fade } from "@remotion/transitions/fade";
 import { slide } from "@remotion/transitions/slide";
-import { staticFile, useVideoConfig } from "remotion";
+import { staticFile, Track, useVideoConfig } from "remotion";
 import { BrandScene } from "../BrandScene";
 import { EndCard } from "../EndCard";
 import { BRAND_PURPLE, NIGHT } from "../theme";
 import { NoteScene } from "./NoteScene";
 import { Soundtrack3 } from "./Soundtrack";
-import { T3 } from "./timeline";
+import { T3, VO_3 } from "./timeline";
 
-// Video 3, "وش صار عليها". 13.5 + 7.2 + 6.6 + 4.5 lockup - (0.5 + 2 × 0.4)
-// transitions = 30.5s: the scripted 26s plus the original Assab lockup.
+// Video 3, "وش صار عليها". 11.1 + 6.2 + 5.2 + 4.5 lockup - (0.5 + 2 × 0.4)
+// transitions = 25.7s, paced to the recorded voiceover.
 // The note slides away to reveal the identity space.
 export const WhatHappened: React.FC = () => {
   const { fps } = useVideoConfig();
@@ -22,7 +22,7 @@ export const WhatHappened: React.FC = () => {
   return (
     <>
       <TransitionSeries>
-        <TransitionSeries.Sequence name="Note" durationInFrames={13.5 * fps}>
+        <TransitionSeries.Sequence name="Note" durationInFrames={11.1 * fps}>
           <NoteScene
             name="Note"
             context="ملاحظـــة في مطعمـــك…"
@@ -37,7 +37,7 @@ export const WhatHappened: React.FC = () => {
           presentation={slide({ direction: "from-bottom" })}
           timing={linearTiming({ durationInFrames: 0.5 * fps })}
         />
-        <TransitionSeries.Sequence name="Brand" durationInFrames={7.2 * fps}>
+        <TransitionSeries.Sequence name="Brand" durationInFrames={6.2 * fps}>
           <BrandScene
             name="Brand"
             title="عصـــب"
@@ -54,7 +54,7 @@ export const WhatHappened: React.FC = () => {
           presentation={fade()}
           timing={fadeTiming}
         />
-        <TransitionSeries.Sequence name="End card" durationInFrames={6.6 * fps}>
+        <TransitionSeries.Sequence name="End card" durationInFrames={5.2 * fps}>
           <EndCard
             name="End card"
             cta="تابـــعوا عصـــب."
@@ -82,6 +82,18 @@ export const WhatHappened: React.FC = () => {
           <Video src={staticFile("assab/closing-lockup.mp4")} />
         </TransitionSeries.Sequence>
       </TransitionSeries>
+      <Track name="Voiceover">
+        {VO_3.map((c) => (
+          <Audio
+            key={c.name}
+            name={`VO – ${c.name}`}
+            src={staticFile("assab/voiceover-3.mp3")}
+            from={Math.round(c.at * fps)}
+            trimBefore={Math.round(c.from * fps)}
+            durationInFrames={Math.round(c.dur * fps)}
+          />
+        ))}
+      </Track>
       <Soundtrack3 />
     </>
   );
