@@ -7,11 +7,7 @@ import {
 import { AssabMark } from "./AssabMark";
 import { Backdrop } from "./Backdrop";
 import { Caption } from "./Caption";
-import {
-  FountainIcon,
-  KingdomCentreIcon,
-  WaterTowerIcon,
-} from "./LandmarkIcons";
+import { IthraIcon, JeddahHouseIcon, MasmakIcon } from "./LandmarkIcons";
 import { RegionPin } from "./RegionPin";
 import { SAUDI_MAP } from "./saudiMap";
 import { SaudiMap } from "./SaudiMap";
@@ -65,31 +61,34 @@ const MapSceneInner = () => {
         >
           <SaudiMap width={1000} />
           <RegionPin
+            x={SAUDI_MAP.dammam[0]}
+            y={SAUDI_MAP.dammam[1]}
+            tilt={TILT}
+            width={170}
+            label="الشرقيــة"
+            at={local(T.next.eastPoint) + 0.15}
+          >
+            <IthraIcon width={170} />
+          </RegionPin>
+          <RegionPin
             x={rx}
             y={ry}
             tilt={TILT}
+            width={210}
             label="الريــاض"
             at={local(T.riyadh.pin)}
           >
-            <KingdomCentreIcon size={84} />
+            <MasmakIcon width={210} />
           </RegionPin>
           <RegionPin
             x={SAUDI_MAP.jeddah[0]}
             y={SAUDI_MAP.jeddah[1]}
             tilt={TILT}
+            width={170}
             label="الغربيــة"
             at={local(T.next.westPoint) + 0.15}
           >
-            <FountainIcon size={84} />
-          </RegionPin>
-          <RegionPin
-            x={SAUDI_MAP.dammam[0]}
-            y={SAUDI_MAP.dammam[1]}
-            tilt={TILT}
-            label="الشرقيــة"
-            at={local(T.next.eastPoint) + 0.15}
-          >
-            <WaterTowerIcon size={84} />
+            <JeddahHouseIcon width={170} />
           </RegionPin>
         </div>
       </div>
