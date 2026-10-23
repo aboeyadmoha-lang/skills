@@ -5,12 +5,20 @@ import {
   useCurrentFrame,
   useVideoConfig,
 } from "remotion";
-import { AssabMark } from "../AssabMark";
-import { BRAND_CYAN, DISPLAY, LAVENDER, TEXT } from "../theme";
-import { WriteOn } from "../WriteOn";
-import { T2 } from "./timeline";
+import { AssabMark } from "./AssabMark";
+import { BRAND_CYAN, DISPLAY, LAVENDER, TEXT } from "./theme";
+import { WriteOn } from "./WriteOn";
 
-const local = (s: number) => s - T2.endStart;
+// Scene-relative cue times in seconds; [start, duration] for write-ons.
+export type EndCues = {
+  readonly mark: number;
+  readonly cta: readonly [number, number];
+  readonly status: readonly [number, number];
+  readonly start?: readonly [number, number];
+  readonly site: number;
+  // One cyan pulse, kept away from the mark.
+  readonly pulse?: number;
+};
 
 // Still end card: one call to action, then launch status and the website,
 // all clear of the mark's protection area. No sign-up link or trial button.
@@ -19,18 +27,19 @@ const EndCardInner = ({
   status,
   start,
   website,
+  cues: e,
 }: {
   readonly cta: string;
   readonly status: string;
   readonly start: string;
   readonly website: string;
+  readonly cues: EndCues;
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const e = T2.endCard;
   const siteIn = interpolate(
     frame,
-    [local(e.site) * fps, (local(e.site) + 0.4) * fps],
+    [e.site * fps, (e.site + 0.4) * fps],
     [0, 1],
     {
       extrapolateLeft: "clamp",
@@ -39,8 +48,31 @@ const EndCardInner = ({
     },
   );
 
+  const pulse =
+    e.pulse === undefined
+      ? 0
+      : interpolate(frame, [e.pulse * fps, (e.pulse + 1.1) * fps], [0, 1], {
+          extrapolateLeft: "clamp",
+          extrapolateRight: "clamp",
+          easing: Easing.out(Easing.cubic),
+        });
+
   return (
     <>
+      {pulse > 0 && pulse < 1 ? (
+        <div
+          style={{
+            position: "absolute",
+            left: 540 - 60 - pulse * 260,
+            top: 1060 - 60 - pulse * 260,
+            width: 120 + pulse * 520,
+            height: 120 + pulse * 520,
+            borderRadius: "50%",
+            border: `${6 - pulse * 4}px solid ${BRAND_CYAN}`,
+            opacity: 1 - pulse,
+          }}
+        />
+      ) : null}
       <div
         style={{
           position: "absolute",
@@ -51,7 +83,7 @@ const EndCardInner = ({
           justifyContent: "center",
         }}
       >
-        <AssabMark height={170} variant="white" revealAt={local(e.mark)} />
+        <AssabMark height={170} variant="white" revealAt={e.mark} />
       </div>
       <div
         dir="rtl"
@@ -74,27 +106,29 @@ const EndCardInner = ({
             lineHeight: 1.25,
           }}
         >
-          <WriteOn text={cta} at={local(e.cta[0])} dur={e.cta[1]} />
+          <WriteOn text={cta} at={e.cta[0]} dur={e.cta[1]} />
           <br />
           <WriteOn
             text={status}
-            at={local(e.status[0])}
+            at={e.status[0]}
             dur={e.status[1]}
             style={{ color: BRAND_CYAN }}
           />
         </Interactive.Div>
-        <Interactive.Div
-          name="Launch"
-          style={{
-            fontFamily: TEXT,
-            fontWeight: 500,
-            fontSize: 62,
-            marginTop: 40,
-            color: LAVENDER,
-          }}
-        >
-          <WriteOn text={start} at={local(e.start[0])} dur={e.start[1]} />
-        </Interactive.Div>
+        {start && e.start ? (
+          <Interactive.Div
+            name="Launch"
+            style={{
+              fontFamily: TEXT,
+              fontWeight: 500,
+              fontSize: 62,
+              marginTop: 40,
+              color: LAVENDER,
+            }}
+          >
+            <WriteOn text={start} at={e.start[0]} dur={e.start[1]} />
+          </Interactive.Div>
+        ) : null}
         <Interactive.Div
           name="Website"
           dir="ltr"
@@ -124,11 +158,7 @@ export const EndCard = Interactive.create({
       description: "Call to action",
     },
     status: { type: "string", default: "قريـــبًا.", description: "Status" },
-    start: {
-      type: "string",
-      default: "البدايـــة من الريـــاض",
-      description: "Launch line",
-    },
+    start: { type: "string", default: "", description: "Launch line" },
     website: { type: "string", default: "Assab.io", description: "Website" },
   },
 });

@@ -5,6 +5,7 @@ import { Title } from "./HelloWorld/Title";
 import { RayhanPromo } from "./Rayhan/RayhanPromo";
 import { AssabLaunch } from "./Assab/AssabLaunch";
 import { EndOfDay } from "./Assab/EndOfDay/EndOfDay";
+import { WhatHappened } from "./Assab/Note/WhatHappened";
 
 // Each <Composition> is an entry in the sidebar!
 
@@ -73,6 +74,14 @@ export const RemotionRoot: React.FC = () => {
         id="AssabEndOfDay"
         component={EndOfDay}
         durationInFrames={783}
+        fps={30}
+        width={1080}
+        height={1920}
+      />
+      <Composition
+        id="AssabWhatHappened"
+        component={WhatHappened}
+        durationInFrames={915}
         fps={30}
         width={1080}
         height={1920}

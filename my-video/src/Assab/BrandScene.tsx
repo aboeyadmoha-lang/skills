@@ -1,21 +1,26 @@
 import { Interactive } from "remotion";
-import { AssabMark } from "../AssabMark";
-import { DISPLAY, TEXT } from "../theme";
-import { WriteOn } from "../WriteOn";
-import { T2 } from "./timeline";
+import { AssabMark } from "./AssabMark";
+import { DISPLAY, TEXT } from "./theme";
+import { WriteOn } from "./WriteOn";
 
-const local = (s: number) => s - T2.brandStart;
+// Scene-relative cue times in seconds; [start, duration] for write-ons.
+export type BrandCues = {
+  readonly mark: number;
+  readonly title: readonly [number, number];
+  readonly line: readonly [number, number];
+};
 
 // Identity space: the full original mark with its protection area, and the
 // name as a separate editorial title, never set beside the mark as a logo.
 const BrandSceneInner = ({
   title,
   line,
+  cues: b,
 }: {
   readonly title: string;
   readonly line: string;
+  readonly cues: BrandCues;
 }) => {
-  const b = T2.brand;
   return (
     <>
       <div
@@ -28,7 +33,7 @@ const BrandSceneInner = ({
           justifyContent: "center",
         }}
       >
-        <AssabMark height={230} variant="white" revealAt={local(b.mark)} />
+        <AssabMark height={230} variant="white" revealAt={b.mark} />
       </div>
       <div
         dir="rtl"
@@ -51,7 +56,7 @@ const BrandSceneInner = ({
             lineHeight: 1.2,
           }}
         >
-          <WriteOn text={title} at={local(b.title[0])} dur={b.title[1]} />
+          <WriteOn text={title} at={b.title[0]} dur={b.title[1]} />
         </Interactive.Div>
         <Interactive.Div
           name="Supporting line"
@@ -63,7 +68,7 @@ const BrandSceneInner = ({
             lineHeight: 1.4,
           }}
         >
-          <WriteOn text={line} at={local(b.line[0])} dur={b.line[1]} />
+          <WriteOn text={line} at={b.line[0]} dur={b.line[1]} />
         </Interactive.Div>
       </div>
     </>

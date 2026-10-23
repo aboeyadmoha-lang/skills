@@ -3,12 +3,12 @@ import { linearTiming, TransitionSeries } from "@remotion/transitions";
 import { fade } from "@remotion/transitions/fade";
 import { staticFile, Track, useVideoConfig } from "remotion";
 import { BRAND_PURPLE, NIGHT } from "../theme";
-import { BrandScene } from "./BrandScene";
-import { EndCard } from "./EndCard";
+import { BrandScene } from "../BrandScene";
+import { EndCard } from "../EndCard";
 import { DayScene } from "./DayScene";
 import { ReviewScene } from "./ReviewScene";
 import { Soundtrack2 } from "./Soundtrack";
-import { VO_2 } from "./timeline";
+import { T2, VO_2 } from "./timeline";
 
 // Video 2, "آخر اليوم". 5 + 8.4 + 5 + 4.8 + 4.5 lockup - 4 × 0.4 fades
 // = 26.1s, paced to the recorded voiceover, ending on the original lockup.
@@ -52,6 +52,11 @@ export const EndOfDay: React.FC = () => {
             name="Brand"
             title="عصـــب"
             line="لمتابعـــة تشغيـــل المطـــاعم وأرقامهـــا"
+            cues={{
+              mark: T2.brand.mark - T2.brandStart,
+              title: [T2.brand.title[0] - T2.brandStart, T2.brand.title[1]],
+              line: [T2.brand.line[0] - T2.brandStart, T2.brand.line[1]],
+            }}
             style={{ backgroundColor: BRAND_PURPLE }}
           />
         </TransitionSeries.Sequence>
@@ -66,6 +71,16 @@ export const EndOfDay: React.FC = () => {
             status="قريـــبًا."
             start="البدايـــة من الريـــاض"
             website="Assab.io"
+            cues={{
+              mark: T2.endCard.mark - T2.endStart,
+              cta: [T2.endCard.cta[0] - T2.endStart, T2.endCard.cta[1]],
+              status: [
+                T2.endCard.status[0] - T2.endStart,
+                T2.endCard.status[1],
+              ],
+              start: [T2.endCard.start[0] - T2.endStart, T2.endCard.start[1]],
+              site: T2.endCard.site - T2.endStart,
+            }}
             style={{ backgroundColor: NIGHT }}
           />
         </TransitionSeries.Sequence>
