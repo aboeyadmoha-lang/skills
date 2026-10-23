@@ -4,9 +4,9 @@ import { fade } from "@remotion/transitions/fade";
 import { staticFile, useVideoConfig } from "remotion";
 import { BRAND_PURPLE, NIGHT } from "../theme";
 import { BrandScene } from "./BrandScene";
-import { DeskScene } from "./DeskScene";
 import { EndCard } from "./EndCard";
-import { RestaurantScene } from "./RestaurantScene";
+import { DayScene } from "./DayScene";
+import { ReviewScene } from "./ReviewScene";
 import { Soundtrack2 } from "./Soundtrack";
 
 // Video 2, "آخر اليوم". 5.2 + 10.4 + 7.4 + 6.6 + 4.5 lockup - 4 × 0.4 fades
@@ -18,26 +18,28 @@ export const EndOfDay: React.FC = () => {
   return (
     <>
       <TransitionSeries>
-        <TransitionSeries.Sequence
-          name="Restaurant"
-          durationInFrames={5.2 * fps}
-        >
-          <RestaurantScene
-            name="Restaurant"
+        <TransitionSeries.Sequence name="Day" durationInFrames={5.2 * fps}>
+          <DayScene
+            name="Day"
             title="آخر اليـــوم"
-            income="إيرادات اليـــوم"
-            spend="ومصروفـــاته"
+            income="وش دخـــل؟"
+            spend="ووش طلـــع؟"
           />
         </TransitionSeries.Sequence>
         <TransitionSeries.Transition
           presentation={fade()}
           timing={fadeTiming}
         />
-        <TransitionSeries.Sequence name="Desk" durationInFrames={10.4 * fps}>
-          <DeskScene
-            name="Desk"
-            review="بنـــود للمراجعـــة"
+        <TransitionSeries.Sequence name="Review" durationInFrames={10.4 * fps}>
+          <ReviewScene
+            name="Review"
+            title="بنـــود للمراجعـــة"
             understand="افهـــم يومـــك"
+            sub="مو بس تخلّصـــه"
+            cash="تسليـــم النقـــد"
+            expenses="العهـــد والمصروفـــات"
+            purchases="استـــلام المشتريـــات"
+            status="بانتظار المراجعـــة"
           />
         </TransitionSeries.Sequence>
         <TransitionSeries.Transition

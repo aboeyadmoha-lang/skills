@@ -1,20 +1,26 @@
 // Video 2 cues in global seconds. Placeholder timings from the script;
 // they are re-aligned to the voiceover once the recording is in.
 export const T2 = {
-  restaurantStart: 0,
-  deskStart: 4.8,
+  dayStart: 0,
+  reviewStart: 4.8,
   brandStart: 14.8,
   endStart: 21.8,
   lockupStart: 28.0,
   end: 32.5,
-  restaurant: {
+  day: {
     mark: 0.3,
     title: [0.4, 1.0],
-    income: [2.0, 0.8],
-    spend: [3.2, 0.8],
+    income: [2.0, 0.6],
+    spend: [3.2, 0.6],
     end: 5.2,
   },
-  desk: { review: [5.5, 1.1], stop: 10.0, understand: [10.6, 1.0] },
+  review: {
+    title: [5.5, 1.1],
+    cards: [5.9, 6.5, 7.1],
+    settle: 10.0,
+    understand: [10.6, 1.0],
+    sub: [11.9, 1.0],
+  },
   brand: { mark: 15.3, title: [15.6, 0.6], line: [16.4, 2.0] },
   endCard: {
     mark: 22.1,

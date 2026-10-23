@@ -26,17 +26,17 @@ export const Soundtrack2: React.FC = () => {
         durationInFrames={Math.round((T2.lockupStart + 0.3) * fps)}
         volume={(f) => bedVolume(f / fps)}
       />
-      {sfx("Mark", "maximize-004", T2.restaurant.mark, 0.35)}
-      {write("Write: end of day", T2.restaurant.title)}
-      {write("Write: income", T2.restaurant.income)}
-      {write("Write: spend", T2.restaurant.spend)}
-      {sfx("To desk", "riser", T2.deskStart - 1.0, 0.3)}
-      {write("Write: review", T2.desk.review)}
-      {sfx("Mark 1", "tick-004", 6.2, 0.35)}
-      {sfx("Mark 2", "tick-004", 7.6, 0.35)}
-      {sfx("Mark 3", "tick-004", 8.9, 0.35)}
-      {sfx("Widen", "shimmer", T2.desk.stop, 0.35)}
-      {write("Write: understand", T2.desk.understand)}
+      {sfx("Mark", "maximize-004", T2.day.mark, 0.35)}
+      {write("Write: end of day", T2.day.title)}
+      {sfx("In card", "notification-pop", T2.day.income[0], 0.35)}
+      {sfx("Out card", "notification-pop", T2.day.spend[0], 0.35)}
+      {sfx("To review", "riser", T2.reviewStart - 1.0, 0.3)}
+      {write("Write: review", T2.review.title)}
+      {sfx("Card 1", "glass-002", T2.review.cards[0], 0.35)}
+      {sfx("Card 2", "glass-002", T2.review.cards[1], 0.35)}
+      {sfx("Card 3", "glass-002", T2.review.cards[2], 0.35)}
+      {sfx("Settle", "shimmer", T2.review.settle, 0.35)}
+      {write("Write: understand", T2.review.understand)}
       {sfx("To brand", "riser", T2.brandStart - 1.0, 0.35)}
       {sfx("Brand mark", "maximize-004", T2.brand.mark, 0.4)}
       {write("Write: title", T2.brand.title)}
