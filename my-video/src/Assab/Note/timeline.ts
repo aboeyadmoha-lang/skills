@@ -8,11 +8,13 @@ export const T3 = {
   end: 25.7,
   note: {
     mark: 0.3,
+    pin: 0.35,
     context: [0.6, 1.18],
     question: [2.3, 0.72],
     swap: 3.9,
     solved: [4.2, 0.57],
     pending: [5.1, 0.56],
+    pinPulse: 5.5,
     calm: 6.4,
     writing: [6.8, 1.08],
     notEnd: [8.1, 1.06],

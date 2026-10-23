@@ -27,7 +27,7 @@ export const WhatHappened: React.FC = () => {
             name="Note"
             context="ملاحظـــة في مطعمـــك…"
             question="وش صـــار عليهـــا؟"
-            solved="انحلّـــت؟"
+            solved="انحلّـــت"
             pending="ولا باقـــي؟"
             writing="كتابـــة الملاحظـــة"
             notEnd="مو نهايـــة المتابعـــة"

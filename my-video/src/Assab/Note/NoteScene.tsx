@@ -28,9 +28,24 @@ const STROKES = [
   { y: 1460, w: 340, at: T3.note.strokes[4] },
   { y: 1540, w: 280, at: T3.note.strokes[5] },
 ] as const;
-// Where the question mark settles: a round sticker on the note's top-left
-// corner, half over the edge so it never covers the writing.
-const STAMP = { x: PAPER.x + 8, y: PAPER.y + 12 };
+// The pushpin that holds the note up, at the top centre of the paper.
+const PIN = { x: 540, y: PAPER.y + 34 };
+
+// A pushpin in the identity purples, its head at (0, 0).
+const Pushpin: React.FC = () => (
+  <g>
+    <path
+      d="M4 8 L16 34"
+      stroke="#8A84A8"
+      strokeWidth={4}
+      strokeLinecap="round"
+    />
+    <ellipse cx={0} cy={8} rx={30} ry={13} fill={BRAND_DARK} />
+    <path d="M-17 -10 H17 V6 H-17 Z" fill={BRAND_PURPLE} />
+    <ellipse cx={0} cy={-10} rx={25} ry={12} fill="#9B6BFF" />
+    <ellipse cx={-8} cy={-13} rx={8} ry={3.5} fill="#FFFFFF" opacity={0.7} />
+  </g>
+);
 
 const scribble = (right: number, y: number, w: number, seed: number) => {
   const pts: string[] = [`M${right} ${y}`];
@@ -81,23 +96,25 @@ const NoteSceneInner = ({
     [0, 1],
     { ...clamp, easing: Easing.inOut(Easing.cubic) },
   );
-  // "؟" appears faint and blurred over the note, then sharpens and settles
-  // in its corner like a stamp: the question stays open, nothing closes it.
-  const ghost = interpolate(
+  // The pin drops in and fixes the note as it appears; the paper gives a
+  // small jolt on impact.
+  const drop = interpolate(frame, [f(n.pin), f(n.pin) + 0.3 * fps], [0, 1], {
+    ...clamp,
+    easing: Easing.in(Easing.quad),
+  });
+  const impact = interpolate(
     frame,
-    [f(n.solved[0]), f(n.solved[0]) + 0.5 * fps],
-    [0, 1],
+    [f(n.pin) + 0.3 * fps, f(n.pin) + 0.4 * fps, f(n.pin) + 0.6 * fps],
+    [0, 1, 0],
     clamp,
   );
-  const settle = interpolate(
+  // On "ولا باقي؟" the pin pulses once: the note is still pinned up.
+  const stillPinned = interpolate(
     frame,
-    [f(n.pending[0]), f(n.pending[0]) + 0.7 * fps],
+    [f(n.pinPulse), f(n.pinPulse) + 0.9 * fps],
     [0, 1],
-    { ...clamp, easing: Easing.bezier(0.16, 1, 0.3, 1) },
+    { ...clamp, easing: Easing.out(Easing.cubic) },
   );
-  const markX = 540 + (STAMP.x - 540) * settle;
-  const markY = 1290 + (STAMP.y - 1290) * settle;
-  const markSize = 300 - 190 * settle;
 
   return (
     <>
@@ -121,7 +138,7 @@ const NoteSceneInner = ({
         </defs>
         <g
           opacity={paperIn}
-          transform={`translate(0 ${float + (1 - paperIn) * 60}) rotate(${tilt} 540 1280)`}
+          transform={`translate(0 ${float + (1 - paperIn) * 60 + impact * 6}) rotate(${tilt} 540 1280)`}
         >
           <rect
             x={PAPER.x}
@@ -133,18 +150,9 @@ const NoteSceneInner = ({
             filter="url(#note-shadow)"
           />
           <rect
-            x={470}
-            y={955}
-            width={140}
-            height={46}
-            rx={6}
-            fill={BRAND_PURPLE}
-            opacity={0.22}
-          />
-          <rect
-            x={PAPER.x + PAPER.w - 220}
+            x={PAPER.x + PAPER.w - 180}
             y={1040}
-            width={160}
+            width={120}
             height={14}
             rx={7}
             fill="#CFC6EE"
@@ -183,30 +191,31 @@ const NoteSceneInner = ({
               </g>
             );
           })}
-          {/* The open question, settling as a stamp in the corner */}
-          <g opacity={ghost * (0.5 + 0.5 * settle)}>
+          {/* Pin shadow on the paper, then the pin itself */}
+          <ellipse
+            cx={PIN.x + 20 + (1 - drop) * 40}
+            cy={PIN.y + 32 + (1 - drop) * 30}
+            rx={38 + (1 - drop) * 24}
+            ry={15 + (1 - drop) * 10}
+            fill={BRAND_DARK}
+            opacity={0.22 * drop}
+          />
+          {stillPinned > 0 && stillPinned < 1 ? (
             <circle
-              cx={STAMP.x}
-              cy={STAMP.y}
-              r={70 * settle}
-              fill="#FFFFFF"
+              cx={PIN.x}
+              cy={PIN.y}
+              r={44 + stillPinned * 90}
+              fill="none"
               stroke={BRAND_PURPLE}
-              strokeWidth={5}
-              filter="url(#note-shadow)"
-              opacity={settle}
+              strokeWidth={4 - stillPinned * 3}
+              opacity={1 - stillPinned}
             />
-            <text
-              x={markX}
-              y={markY + markSize * 0.36}
-              textAnchor="middle"
-              fontFamily={DISPLAY}
-              fontWeight={700}
-              fontSize={markSize}
-              fill={BRAND_PURPLE}
-              style={{ filter: `blur(${(1 - settle) * 14}px)` }}
-            >
-              ؟
-            </text>
+          ) : null}
+          <g
+            opacity={drop > 0 ? 1 : 0}
+            transform={`translate(${PIN.x} ${PIN.y - (1 - drop) * 240 + impact * 3}) scale(${1.45 * (1 + (1 - drop) * 0.5 - impact * 0.06)} ${1.45 * (1 + (1 - drop) * 0.5 + impact * 0.04)})`}
+          >
+            <Pushpin />
           </g>
         </g>
       </svg>
@@ -334,7 +343,7 @@ export const NoteScene = Interactive.create({
     },
     solved: {
       type: "string",
-      default: "انحلّـــت؟",
+      default: "انحلّـــت",
       description: "First question",
     },
     pending: {

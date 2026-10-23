@@ -28,11 +28,11 @@ export const Soundtrack3: React.FC = () => {
         volume={(f) => bedVolume(f / fps)}
       />
       {sfx("Mark", "maximize-004", n.mark, 0.35)}
+      {sfx("Pin", "drop-002", n.pin + 0.28, 0.55)}
       {write("Write: context", n.context)}
       {sfx("Question", "notification-pop", n.question[0], 0.35)}
       {write("Write: solved", n.solved)}
-      {sfx("Question mark appears", "maximize-008", n.solved[0] + 0.1, 0.25)}
-      {sfx("Question mark settles", "glass-002", n.pending[0] + 0.55, 0.4)}
+      {sfx("Still pinned", "tick-004", n.pinPulse, 0.3)}
       {write("Write: not the end", n.writing)}
       {sfx("Note grows", "maximize-004", n.extend[0], 0.3)}
       {n.strokes.map(([at], i) => sfx(`Pen ${i + 1}`, "tick-004", at, 0.15))}
