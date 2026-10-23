@@ -17,12 +17,20 @@ const INK = "#5B4E9A";
 
 // A neutral operations note: hand-written strokes, no readable content.
 const PAPER = { x: 290, y: 980, w: 500, h: 600 };
+const PAPER_GROWN = 820;
+// Strokes write on as the voiceover speaks; the last two only exist once
+// the note has grown, because follow-up does not stop at the writing.
 const STROKES = [
-  { y: 1110, w: 380 },
-  { y: 1190, w: 320 },
-  { y: 1270, w: 360 },
-  { y: 1350, w: 240 },
+  { y: 1110, w: 380, at: T3.note.strokes[0] },
+  { y: 1190, w: 320, at: T3.note.strokes[1] },
+  { y: 1270, w: 360, at: T3.note.strokes[2] },
+  { y: 1350, w: 240, at: T3.note.strokes[3] },
+  { y: 1460, w: 340, at: T3.note.strokes[4] },
+  { y: 1540, w: 280, at: T3.note.strokes[5] },
 ] as const;
+// Where the question mark settles: a round sticker on the note's top-left
+// corner, half over the edge so it never covers the writing.
+const STAMP = { x: PAPER.x + 8, y: PAPER.y + 12 };
 
 const scribble = (right: number, y: number, w: number, seed: number) => {
   const pts: string[] = [`M${right} ${y}`];
@@ -66,15 +74,30 @@ const NoteSceneInner = ({
     ...clamp,
     easing: Easing.bezier(0.16, 1, 0.3, 1),
   });
-  // A thin line carries on past the edge of the note: follow-up continues.
-  const trail = interpolate(
+  // Writing does not end the follow-up: the note grows and keeps going.
+  const grow = interpolate(
     frame,
-    [f(n.trail[0]), f(n.trail[0] + n.trail[1])],
+    [f(n.extend[0]), f(n.extend[0] + n.extend[1])],
     [0, 1],
     { ...clamp, easing: Easing.inOut(Easing.cubic) },
   );
-  const last = STROKES[STROKES.length - 1];
-  const trailStart = PAPER.x + PAPER.w - 60 - last.w;
+  // "؟" appears faint and blurred over the note, then sharpens and settles
+  // in its corner like a stamp: the question stays open, nothing closes it.
+  const ghost = interpolate(
+    frame,
+    [f(n.solved[0]), f(n.solved[0]) + 0.5 * fps],
+    [0, 1],
+    clamp,
+  );
+  const settle = interpolate(
+    frame,
+    [f(n.pending[0]), f(n.pending[0]) + 0.7 * fps],
+    [0, 1],
+    { ...clamp, easing: Easing.bezier(0.16, 1, 0.3, 1) },
+  );
+  const markX = 540 + (STAMP.x - 540) * settle;
+  const markY = 1290 + (STAMP.y - 1290) * settle;
+  const markSize = 300 - 190 * settle;
 
   return (
     <>
@@ -104,7 +127,7 @@ const NoteSceneInner = ({
             x={PAPER.x}
             y={PAPER.y}
             width={PAPER.w}
-            height={PAPER.h}
+            height={PAPER.h + (PAPER_GROWN - PAPER.h) * grow}
             rx={12}
             fill="#FFFFFF"
             filter="url(#note-shadow)"
@@ -126,31 +149,66 @@ const NoteSceneInner = ({
             rx={7}
             fill="#CFC6EE"
           />
-          {STROKES.map((s, i) => (
-            <path
-              key={i}
-              d={scribble(PAPER.x + PAPER.w - 60, s.y, s.w, i * 2.1)}
-              stroke={INK}
+          {STROKES.map((st, i) => {
+            const right = PAPER.x + PAPER.w - 60;
+            const p = interpolate(
+              frame,
+              [f(st.at[0]), f(st.at[0] + st.at[1])],
+              [0, 1],
+              {
+                ...clamp,
+                easing: Easing.inOut(Easing.quad),
+              },
+            );
+            if (p === 0) return null;
+            const hx = right - st.w * p;
+            const hy = st.y + Math.sin((st.w * p) / 13 + i * 2.1) * 5;
+            return (
+              <g key={i}>
+                <path
+                  d={scribble(right, st.y, st.w, i * 2.1)}
+                  stroke={INK}
+                  strokeWidth={5}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  fill="none"
+                  opacity={0.75}
+                  pathLength={1}
+                  strokeDasharray={1}
+                  strokeDashoffset={1 - p}
+                />
+                {p < 1 ? (
+                  <circle cx={hx} cy={hy} r={7} fill={BRAND_PURPLE} />
+                ) : null}
+              </g>
+            );
+          })}
+          {/* The open question, settling as a stamp in the corner */}
+          <g opacity={ghost * (0.5 + 0.5 * settle)}>
+            <circle
+              cx={STAMP.x}
+              cy={STAMP.y}
+              r={70 * settle}
+              fill="#FFFFFF"
+              stroke={BRAND_PURPLE}
               strokeWidth={5}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              fill="none"
-              opacity={0.75}
+              filter="url(#note-shadow)"
+              opacity={settle}
             />
-          ))}
+            <text
+              x={markX}
+              y={markY + markSize * 0.36}
+              textAnchor="middle"
+              fontFamily={DISPLAY}
+              fontWeight={700}
+              fontSize={markSize}
+              fill={BRAND_PURPLE}
+              style={{ filter: `blur(${(1 - settle) * 14}px)` }}
+            >
+              ؟
+            </text>
+          </g>
         </g>
-        {/* Continues from the note's last stroke out past its edge */}
-        <path
-          d={`M${trailStart} ${last.y} C ${trailStart - 160} ${last.y + 10}, 120 ${last.y + 80}, -40 ${last.y + 40}`}
-          stroke={BRAND_PURPLE}
-          strokeWidth={5}
-          strokeLinecap="round"
-          fill="none"
-          pathLength={1}
-          strokeDasharray={1}
-          strokeDashoffset={1 - trail}
-          opacity={trail > 0 ? 1 : 0}
-        />
       </svg>
 
       <div style={{ position: "absolute", top: 110, left: 80 }}>

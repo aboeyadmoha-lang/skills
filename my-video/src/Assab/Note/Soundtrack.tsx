@@ -31,9 +31,11 @@ export const Soundtrack3: React.FC = () => {
       {write("Write: context", n.context)}
       {sfx("Question", "notification-pop", n.question[0], 0.35)}
       {write("Write: solved", n.solved)}
-      {sfx("Pending", "glass-002", n.pending[0], 0.35)}
+      {sfx("Question mark appears", "maximize-008", n.solved[0] + 0.1, 0.25)}
+      {sfx("Question mark settles", "glass-002", n.pending[0] + 0.55, 0.4)}
       {write("Write: not the end", n.writing)}
-      {sfx("Trail", "shimmer", n.trail[0], 0.3)}
+      {sfx("Note grows", "maximize-004", n.extend[0], 0.3)}
+      {n.strokes.map(([at], i) => sfx(`Pen ${i + 1}`, "tick-004", at, 0.15))}
       {sfx("To brand", "riser", T3.brandStart - 1.0, 0.35)}
       {sfx("Brand mark", "maximize-004", T3.brand.mark, 0.4)}
       {write("Write: title", T3.brand.title)}
