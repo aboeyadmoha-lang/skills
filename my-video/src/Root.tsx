@@ -72,7 +72,7 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="AssabEndOfDay"
         component={EndOfDay}
-        durationInFrames={975}
+        durationInFrames={783}
         fps={30}
         width={1080}
         height={1920}
