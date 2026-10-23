@@ -19,17 +19,13 @@ export const T = {
   next: {
     title: [12.5, 0.9],
     accent: [13.7, 1.9],
-    westLine: 14.0,
-    westPoint: 14.8,
-    eastLine: 14.9,
-    eastPoint: 15.7,
+    westPoint: 14.2,
+    eastPoint: 14.95,
     end: 19.1,
   },
   later: { title: [19.51, 0.85], accent: [20.65, 1.6], sweep: 20.6, end: 26.4 },
   outro: { cta: [26.41, 0.5], status: [27.17, 0.6], site: 28.0 },
 } as const;
-
-export const LINE_DRAW = 0.8;
 
 // Where the voiceover is speaking, for ducking the background bed.
 export const VO_SPANS: readonly (readonly [number, number])[] = [

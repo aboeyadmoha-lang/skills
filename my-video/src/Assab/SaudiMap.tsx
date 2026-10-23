@@ -1,7 +1,7 @@
 import { Easing, interpolate, useCurrentFrame, useVideoConfig } from "remotion";
 import { SAUDI_MAP } from "./saudiMap";
 import { BRAND_CYAN, BRAND_DARK, BRAND_PURPLE, LAND } from "./theme";
-import { LINE_DRAW, T } from "./timeline";
+import { T } from "./timeline";
 
 type Point = readonly [number, number];
 
@@ -12,51 +12,6 @@ const clamp = {
 
 // Scene-relative seconds for the map cues.
 const local = (globalSeconds: number) => globalSeconds - T.mapStart;
-
-// A gentle arc between two points, bowed upwards.
-const arc = (from: Point, to: Point, lift: number) => {
-  const c: Point = [(from[0] + to[0]) / 2, (from[1] + to[1]) / 2 - lift];
-  const at = (p: number): Point => [
-    (1 - p) ** 2 * from[0] + 2 * (1 - p) * p * c[0] + p ** 2 * to[0],
-    (1 - p) ** 2 * from[1] + 2 * (1 - p) * p * c[1] + p ** 2 * to[1],
-  ];
-  return {
-    d: `M ${from[0]} ${from[1]} Q ${c[0]} ${c[1]} ${to[0]} ${to[1]}`,
-    at,
-  };
-};
-
-const Route: React.FC<{
-  readonly from: Point;
-  readonly to: Point;
-  readonly lift: number;
-  readonly at: number;
-}> = ({ from, to, lift, at }) => {
-  const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
-  const p = interpolate(frame, [at * fps, (at + LINE_DRAW) * fps], [0, 1], {
-    ...clamp,
-    easing: Easing.bezier(0.45, 0, 0.25, 1),
-  });
-  const { d, at: pointAt } = arc(from, to, lift);
-  const [hx, hy] = pointAt(p);
-
-  return (
-    <g opacity={p > 0 ? 1 : 0}>
-      <path
-        d={d}
-        fill="none"
-        stroke={BRAND_PURPLE}
-        strokeWidth={5}
-        strokeLinecap="round"
-        pathLength={1}
-        strokeDasharray={1}
-        strokeDashoffset={1 - p}
-      />
-      {p < 1 ? <circle cx={hx} cy={hy} r={9} fill={BRAND_CYAN} /> : null}
-    </g>
-  );
-};
 
 const CityPoint: React.FC<{ readonly point: Point; readonly at: number }> = ({
   point,
@@ -158,7 +113,7 @@ export const SaudiMap: React.FC<{ readonly width: number }> = ({ width }) => {
       <g clipPath="url(#ksa-clip)" opacity={fadeIn(local(T.next.westPoint))}>
         <circle cx={wx} cy={wy} r={260} fill="url(#west-glow)" />
       </g>
-      {/* East: the Eastern Province fills when its route arrives */}
+      {/* East: the Eastern Province fills when its point lands */}
       <path
         d={SAUDI_MAP.eastern}
         fill={BRAND_PURPLE}
@@ -182,18 +137,6 @@ export const SaudiMap: React.FC<{ readonly width: number }> = ({ width }) => {
         strokeLinejoin="round"
       />
 
-      <Route
-        from={riyadh}
-        to={SAUDI_MAP.jeddah}
-        lift={140}
-        at={local(T.next.westLine)}
-      />
-      <Route
-        from={riyadh}
-        to={SAUDI_MAP.dammam}
-        lift={90}
-        at={local(T.next.eastLine)}
-      />
       <CityPoint point={SAUDI_MAP.jeddah} at={local(T.next.westPoint)} />
       <CityPoint point={SAUDI_MAP.dammam} at={local(T.next.eastPoint)} />
       <CityPoint point={riyadh} at={local(T.riyadh.dot)} />

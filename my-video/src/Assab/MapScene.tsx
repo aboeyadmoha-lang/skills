@@ -7,8 +7,6 @@ import {
 import { AssabMark } from "./AssabMark";
 import { Backdrop } from "./Backdrop";
 import { Caption } from "./Caption";
-import { IthraIcon, JeddahHouseIcon, MasmakIcon } from "./LandmarkIcons";
-import { RegionPin } from "./RegionPin";
 import { SAUDI_MAP } from "./saudiMap";
 import { SaudiMap } from "./SaudiMap";
 import { T } from "./timeline";
@@ -28,7 +26,7 @@ const MapSceneInner = () => {
       <div style={{ position: "absolute", top: 110, left: 80 }}>
         <AssabMark height={64} variant="color" revealAt={0.3} />
       </div>
-      {/* The map lies tilted back; pins stand upright on it */}
+      {/* The map lies tilted back */}
       <div
         style={{
           position: "absolute",
@@ -48,7 +46,6 @@ const MapSceneInner = () => {
           style={{
             position: "absolute",
             inset: 0,
-            transformStyle: "preserve-3d",
             transformOrigin: `${rx / 10}% ${ry / 10}%`,
             rotate: `x ${TILT}deg`,
             scale: interpolate(
@@ -60,36 +57,6 @@ const MapSceneInner = () => {
           }}
         >
           <SaudiMap width={1000} />
-          <RegionPin
-            x={SAUDI_MAP.dammam[0]}
-            y={SAUDI_MAP.dammam[1]}
-            tilt={TILT}
-            width={170}
-            label="الشرقيــة"
-            at={local(T.next.eastPoint) + 0.15}
-          >
-            <IthraIcon width={170} />
-          </RegionPin>
-          <RegionPin
-            x={rx}
-            y={ry}
-            tilt={TILT}
-            width={210}
-            label="الريــاض"
-            at={local(T.riyadh.pin)}
-          >
-            <MasmakIcon width={210} />
-          </RegionPin>
-          <RegionPin
-            x={SAUDI_MAP.jeddah[0]}
-            y={SAUDI_MAP.jeddah[1]}
-            tilt={TILT}
-            width={170}
-            label="الغربيــة"
-            at={local(T.next.westPoint) + 0.15}
-          >
-            <JeddahHouseIcon width={170} />
-          </RegionPin>
         </div>
       </div>
       <Caption
