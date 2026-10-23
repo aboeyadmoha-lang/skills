@@ -6,9 +6,13 @@ import {
   useVideoConfig,
 } from "remotion";
 import { BRAND_CYAN, DISPLAY, TEXT } from "./theme";
+import { T } from "./timeline";
+import { WriteOn } from "./WriteOn";
 
 // Call to action on the dark background, as in the latest Assab video.
 // The logo lockup that follows is the original closing, used as is.
+const local = (globalSeconds: number) => globalSeconds - T.outroStart;
+
 const OutroSceneInner = ({
   cta,
   status,
@@ -20,12 +24,7 @@ const OutroSceneInner = ({
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const fadeIn = (from: number) =>
-    interpolate(frame, [from * fps, (from + 0.45) * fps], [0, 1], {
-      extrapolateLeft: "clamp",
-      extrapolateRight: "clamp",
-      easing: Easing.bezier(0.16, 1, 0.3, 1),
-    });
+  const siteAt = local(T.outro.site);
 
   return (
     <div style={{ textAlign: "center", padding: "0 80px" }}>
@@ -37,16 +36,18 @@ const OutroSceneInner = ({
           fontFamily: DISPLAY,
           fontWeight: 700,
           fontSize: 124,
-          lineHeight: 1.2,
+          lineHeight: 1.25,
           color: "#FFFFFF",
-          opacity: fadeIn(0.2),
         }}
       >
-        {cta}
+        <WriteOn text={cta} at={local(T.outro.cta[0])} dur={T.outro.cta[1]} />
         <br />
-        <span style={{ color: BRAND_CYAN, opacity: fadeIn(0.6) }}>
-          {status}
-        </span>
+        <WriteOn
+          text={status}
+          at={local(T.outro.status[0])}
+          dur={T.outro.status[1]}
+          style={{ color: BRAND_CYAN }}
+        />
       </Interactive.Div>
       <Interactive.Div
         name="Website"
@@ -57,7 +58,16 @@ const OutroSceneInner = ({
           fontSize: 50,
           marginTop: 70,
           color: "#FFFFFF",
-          opacity: fadeIn(1.0),
+          opacity: interpolate(
+            frame,
+            [siteAt * fps, (siteAt + 0.4) * fps],
+            [0, 1],
+            {
+              extrapolateLeft: "clamp",
+              extrapolateRight: "clamp",
+              easing: Easing.bezier(0.16, 1, 0.3, 1),
+            },
+          ),
         }}
       >
         {website}
@@ -73,10 +83,10 @@ export const OutroScene = Interactive.create({
     ...Interactive.backgroundSchema,
     cta: {
       type: "string",
-      default: "تابعوا عصب.",
+      default: "تابـــعوا عصـــب.",
       description: "Call to action",
     },
-    status: { type: "string", default: "قريبًا.", description: "Status" },
+    status: { type: "string", default: "قريـــبًا.", description: "Status" },
     website: { type: "string", default: "Assab.io", description: "Website" },
   },
 });

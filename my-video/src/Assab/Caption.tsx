@@ -6,29 +6,36 @@ import {
   useVideoConfig,
 } from "remotion";
 import { BRAND_DARK, BRAND_PURPLE, DISPLAY, TEXT } from "./theme";
+import { WriteOn } from "./WriteOn";
 
-// Optional tag pill, a dark headline line and a purple accent line.
-// `start` and `end` are seconds relative to the scene.
+// Optional tag pill, a dark headline line and a purple accent line, each
+// written on in time with the voiceover. Times are scene-relative seconds.
 const CaptionInner = ({
   tag,
   title,
   accent,
-  start,
+  titleAt,
+  titleDur,
+  accentAt,
+  accentDur,
   end,
   style,
 }: {
   readonly tag: string;
   readonly title: string;
   readonly accent: string;
-  readonly start: number;
+  readonly titleAt: number;
+  readonly titleDur: number;
+  readonly accentAt: number;
+  readonly accentDur: number;
   readonly end: number;
   readonly style?: React.CSSProperties;
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  const enter = interpolate(
+  const tagIn = interpolate(
     frame,
-    [start * fps, (start + 0.45) * fps],
+    [(titleAt - 0.2) * fps, (titleAt + 0.2) * fps],
     [0, 1],
     {
       extrapolateLeft: "clamp",
@@ -50,8 +57,7 @@ const CaptionInner = ({
         left: 80,
         right: 80,
         textAlign: "right",
-        opacity: Math.min(enter, exit),
-        translate: `0px ${(1 - enter) * 24}px`,
+        opacity: exit,
         ...style,
       }}
     >
@@ -69,6 +75,9 @@ const CaptionInner = ({
             fontWeight: 500,
             fontSize: 38,
             marginBottom: 22,
+            opacity: tagIn,
+            scale: interpolate(tagIn, [0, 1], [0.85, 1]),
+            transformOrigin: "right center",
           }}
         >
           <span
@@ -86,22 +95,37 @@ const CaptionInner = ({
         style={{
           fontFamily: DISPLAY,
           fontWeight: 700,
-          fontSize: 104,
-          lineHeight: 1.2,
+          fontSize: 100,
+          lineHeight: 1.25,
           color: BRAND_DARK,
         }}
       >
-        {title}
+        <WriteOn text={title} at={titleAt} dur={titleDur} />
         {accent ? (
           <>
             <br />
-            <span style={{ color: BRAND_PURPLE }}>{accent}</span>
+            <WriteOn
+              text={accent}
+              at={accentAt}
+              dur={accentDur}
+              style={{ color: BRAND_PURPLE }}
+            />
           </>
         ) : null}
       </div>
     </div>
   );
 };
+
+const seconds = (description: string, value: number) =>
+  ({
+    type: "number",
+    default: value,
+    step: 0.05,
+    description,
+    hiddenFromList: false,
+    keyframable: false,
+  }) as const;
 
 export const Caption = Interactive.create({
   Component: CaptionInner,
@@ -110,21 +134,10 @@ export const Caption = Interactive.create({
     tag: { type: "string", default: "", description: "Tag" },
     title: { type: "string", default: "", description: "Headline" },
     accent: { type: "string", default: "", description: "Accent line" },
-    start: {
-      type: "number",
-      default: 0,
-      step: 0.1,
-      description: "Start (s)",
-      hiddenFromList: false,
-      keyframable: false,
-    },
-    end: {
-      type: "number",
-      default: 3,
-      step: 0.1,
-      description: "End (s)",
-      hiddenFromList: false,
-      keyframable: false,
-    },
+    titleAt: seconds("Headline start (s)", 0),
+    titleDur: seconds("Headline write (s)", 1),
+    accentAt: seconds("Accent start (s)", 1),
+    accentDur: seconds("Accent write (s)", 1),
+    end: seconds("End (s)", 3),
   },
 });

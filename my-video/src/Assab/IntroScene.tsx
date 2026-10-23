@@ -1,12 +1,8 @@
-import {
-  Easing,
-  Interactive,
-  interpolate,
-  useCurrentFrame,
-  useVideoConfig,
-} from "remotion";
+import { Interactive } from "remotion";
 import { AssabMark } from "./AssabMark";
 import { BRAND_CYAN, DISPLAY, LAVENDER, TEXT } from "./theme";
+import { T } from "./timeline";
+import { WriteOn } from "./WriteOn";
 
 const IntroSceneInner = ({
   title,
@@ -17,24 +13,8 @@ const IntroSceneInner = ({
   readonly accent: string;
   readonly audience: string;
 }) => {
-  const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
-  const fadeUp = (from: number) => ({
-    opacity: interpolate(frame, [from * fps, (from + 0.45) * fps], [0, 1], {
-      extrapolateLeft: "clamp",
-      extrapolateRight: "clamp",
-    }),
-    translate: `0px ${interpolate(
-      frame,
-      [from * fps, (from + 0.45) * fps],
-      [24, 0],
-      {
-        extrapolateLeft: "clamp",
-        extrapolateRight: "clamp",
-        easing: Easing.bezier(0.16, 1, 0.3, 1),
-      },
-    )}px`,
-  });
+  const [audienceAt, audienceDur] = T.intro.audience;
+  const [titleAt, titleDur] = T.intro.title;
 
   return (
     <>
@@ -49,14 +29,14 @@ const IntroSceneInner = ({
           justifyContent: "center",
         }}
       >
-        <AssabMark height={200} variant="white" revealAt={0.2} />
+        <AssabMark height={200} variant="white" revealAt={T.intro.logo} />
       </div>
       <div
         dir="rtl"
         lang="ar"
         style={{
           position: "absolute",
-          top: 1060,
+          top: 1040,
           left: 80,
           right: 80,
           textAlign: "center",
@@ -68,12 +48,17 @@ const IntroSceneInner = ({
             fontFamily: DISPLAY,
             fontWeight: 700,
             fontSize: 132,
-            lineHeight: 1.2,
+            lineHeight: 1.25,
             color: "#FFFFFF",
-            ...fadeUp(1.0),
           }}
         >
-          {title} <span style={{ color: BRAND_CYAN }}>{accent}</span>
+          <WriteOn text={title} at={titleAt} dur={titleDur * 0.45} />{" "}
+          <WriteOn
+            text={accent}
+            at={titleAt + titleDur * 0.45}
+            dur={titleDur * 0.55}
+            style={{ color: BRAND_CYAN }}
+          />
         </Interactive.Div>
         <Interactive.Div
           name="Audience"
@@ -83,10 +68,9 @@ const IntroSceneInner = ({
             fontSize: 60,
             marginTop: 24,
             color: LAVENDER,
-            ...fadeUp(0.6),
           }}
         >
-          {audience}
+          <WriteOn text={audience} at={audienceAt} dur={audienceDur} />
         </Interactive.Div>
       </div>
     </>
@@ -98,11 +82,11 @@ export const IntroScene = Interactive.create({
   layout: "absolute-fill",
   schema: {
     ...Interactive.backgroundSchema,
-    title: { type: "string", default: "عصب", description: "Title" },
-    accent: { type: "string", default: "قريبًا", description: "Accent" },
+    title: { type: "string", default: "عصـــب", description: "Title" },
+    accent: { type: "string", default: "قريـــبًا", description: "Accent" },
     audience: {
       type: "string",
-      default: "لأصحاب المطاعم",
+      default: "لأصحـــاب المطـــاعم",
       description: "Audience line",
     },
   },

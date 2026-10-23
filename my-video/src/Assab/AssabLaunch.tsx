@@ -5,9 +5,10 @@ import { staticFile, Track, useVideoConfig } from "remotion";
 import { IntroScene } from "./IntroScene";
 import { MapScene } from "./MapScene";
 import { OutroScene } from "./OutroScene";
+import { Soundtrack } from "./Soundtrack";
 import { NIGHT, SURFACE } from "./theme";
 
-// 4.2s + 22.6s + 4s + 4.5s lockup - 3 × 0.4s fades = 33.7s.
+// 4.2s + 22.6s + 4s + 4.5s lockup - 3 × 0.4s fades = 34.1s.
 // The scripted 32s ends at the call to action; the original Assab logo
 // lockup from the latest video is appended after it, untouched.
 // Each voiceover line is cut from the recording and placed at its scene.
@@ -21,9 +22,9 @@ export const AssabLaunch: React.FC = () => {
         <TransitionSeries.Sequence name="Intro" durationInFrames={4.2 * fps}>
           <IntroScene
             name="Intro"
-            title="عصب"
-            accent="قريبًا"
-            audience="لأصحاب المطاعم"
+            title="عصـــب"
+            accent="قريـــبًا"
+            audience="لأصحـــاب المطـــاعم"
             style={{
               backgroundColor: NIGHT,
               alignItems: "center",
@@ -44,8 +45,8 @@ export const AssabLaunch: React.FC = () => {
         <TransitionSeries.Sequence name="Outro" durationInFrames={4 * fps}>
           <OutroScene
             name="Outro"
-            cta="تابعوا عصب."
-            status="قريبًا."
+            cta="تابـــعوا عصـــب."
+            status="قريـــبًا."
             website="Assab.io"
             style={{
               backgroundColor: NIGHT,
@@ -65,6 +66,7 @@ export const AssabLaunch: React.FC = () => {
           <Video src={staticFile("assab/closing-lockup.mp4")} />
         </TransitionSeries.Sequence>
       </TransitionSeries>
+      <Soundtrack />
       <Track name="Voiceover">
         <Audio
           name="VO 1 – audience"

@@ -7,11 +7,23 @@ import {
 import { AssabMark } from "./AssabMark";
 import { Backdrop } from "./Backdrop";
 import { Caption } from "./Caption";
-import { MAP_PHASES, SaudiMap } from "./SaudiMap";
+import {
+  FountainIcon,
+  KingdomCentreIcon,
+  WaterTowerIcon,
+} from "./LandmarkIcons";
+import { RegionPin } from "./RegionPin";
+import { SAUDI_MAP } from "./saudiMap";
+import { SaudiMap } from "./SaudiMap";
+import { T } from "./timeline";
+
+const TILT = 32;
+const local = (globalSeconds: number) => globalSeconds - T.mapStart;
 
 const MapSceneInner = () => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
+  const [rx, ry] = SAUDI_MAP.riyadhCity;
 
   return (
     <>
@@ -20,53 +32,113 @@ const MapSceneInner = () => {
       <div style={{ position: "absolute", top: 110, left: 80 }}>
         <AssabMark height={64} variant="color" revealAt={0.3} />
       </div>
+      {/* The map lies tilted back; pins stand upright on it */}
       <div
         style={{
           position: "absolute",
-          top: 860,
+          top: 820,
           left: 40,
+          width: 1000,
+          height: 1000,
+          perspective: 1800,
+          perspectiveOrigin: "50% 0%",
           opacity: interpolate(frame, [0, 0.5 * fps], [0, 1], {
             extrapolateLeft: "clamp",
             extrapolateRight: "clamp",
           }),
         }}
       >
-        <SaudiMap width={1000} />
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            transformStyle: "preserve-3d",
+            transformOrigin: `${rx / 10}% ${ry / 10}%`,
+            rotate: `x ${TILT}deg`,
+            scale: interpolate(
+              frame,
+              [0, local(T.later.sweep) * fps, local(T.later.end) * fps],
+              [1, 1.04, 1.08],
+              { extrapolateLeft: "clamp", extrapolateRight: "clamp" },
+            ),
+          }}
+        >
+          <SaudiMap width={1000} />
+          <RegionPin
+            x={rx}
+            y={ry}
+            tilt={TILT}
+            label="الريــاض"
+            at={local(T.riyadh.pin)}
+          >
+            <KingdomCentreIcon size={84} />
+          </RegionPin>
+          <RegionPin
+            x={SAUDI_MAP.jeddah[0]}
+            y={SAUDI_MAP.jeddah[1]}
+            tilt={TILT}
+            label="الغربيــة"
+            at={local(T.next.westPoint) + 0.15}
+          >
+            <FountainIcon size={84} />
+          </RegionPin>
+          <RegionPin
+            x={SAUDI_MAP.dammam[0]}
+            y={SAUDI_MAP.dammam[1]}
+            tilt={TILT}
+            label="الشرقيــة"
+            at={local(T.next.eastPoint) + 0.15}
+          >
+            <WaterTowerIcon size={84} />
+          </RegionPin>
+        </div>
       </div>
       <Caption
         name="Platform caption"
         tag=""
-        title="متابعة أوضح"
-        accent="لتشغيل مطعمك"
-        start={0.4}
-        end={MAP_PHASES.riyadh}
+        title="متابعـــة أوضـــح"
+        accent="لتشغيـــل مطعمـــك"
+        titleAt={local(T.platform.title[0])}
+        titleDur={T.platform.title[1]}
+        accentAt={local(T.platform.accent[0])}
+        accentDur={T.platform.accent[1]}
+        end={local(T.platform.end)}
         style={{ top: 330 }}
       />
       <Caption
         name="Riyadh caption"
-        tag="خطة الانطلاق"
-        title="البداية:"
-        accent="الرياض"
-        start={MAP_PHASES.riyadh}
-        end={MAP_PHASES.next}
-        style={{ top: 280 }}
+        tag="خطـــة الانطـــلاق"
+        title="البدايـــة:"
+        accent="الريـــاض"
+        titleAt={local(T.riyadh.title[0])}
+        titleDur={T.riyadh.title[1]}
+        accentAt={local(T.riyadh.accent[0])}
+        accentDur={T.riyadh.accent[1]}
+        end={local(T.riyadh.end)}
+        style={{ top: 270 }}
       />
       <Caption
         name="Next step caption"
         tag=""
-        title="الخطوة القادمة"
-        accent="الغربية والشرقية"
-        start={MAP_PHASES.next}
-        end={MAP_PHASES.later}
+        title="الخطـــوة القادمـــة"
+        accent="الغربيـــة والشرقيـــة"
+        titleAt={local(T.next.title[0])}
+        titleDur={T.next.title[1]}
+        accentAt={local(T.next.accent[0])}
+        accentDur={T.next.accent[1]}
+        end={local(T.next.end)}
         style={{ top: 330 }}
       />
       <Caption
         name="Later caption"
         tag=""
-        title="لاحقًا بإذن الله"
-        accent="كل مدن المملكة"
-        start={MAP_PHASES.later}
-        end={MAP_PHASES.end}
+        title="لاحـــقًا بإذن الله"
+        accent="كل مدن المملكـــة"
+        titleAt={local(T.later.title[0])}
+        titleDur={T.later.title[1]}
+        accentAt={local(T.later.accent[0])}
+        accentDur={T.later.accent[1]}
+        end={local(T.later.end)}
         style={{ top: 330 }}
       />
     </>
